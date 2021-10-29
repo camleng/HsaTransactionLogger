@@ -1,7 +1,7 @@
 namespace Business.Models;
 
-public class ApiKey
+public record ApiKey
 {
-    public string Name { get; set; }
-    public string Value { get; set; }
+    public string? Name { get; set; }
+    public string? Value { get; set; }
 }
