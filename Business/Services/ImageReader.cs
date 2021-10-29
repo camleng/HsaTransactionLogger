@@ -1,3 +1,7 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Business.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +16,7 @@ public class ImageReader : IImageReader
     public ImageReader(IConfiguration configuration)
     {
         configuration.GetSection(nameof(CognitiveServicesConfig)).Bind(_config);
+        if (_config is null) throw new Exception("Configuration is not set");
     }
 
     public async Task<string> ReadTextFromImageToJson(IFormFile file)

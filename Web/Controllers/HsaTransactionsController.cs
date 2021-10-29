@@ -1,10 +1,12 @@
+using System.Threading.Tasks;
 using Business.Extractors;
 using Business.Parsers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Web.Controllers;
 
-[Controller]
+[ApiController]
 [Route("api/HsaTransactions")]
 public class HsaTransactionsController : ControllerBase
 {
@@ -15,7 +17,8 @@ public class HsaTransactionsController : ControllerBase
       _imageReader = imageReader;
    }
 
-   [HttpGet("FromImage")]
+   [Route("FromImage")]
+   [HttpGet]
    public async Task<ActionResult> GetFromImage(IFormFile file)
    {
       var json = await _imageReader.ReadTextFromImageToJson(file);
