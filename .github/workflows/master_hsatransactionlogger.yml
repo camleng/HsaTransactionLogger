@@ -53,5 +53,5 @@ jobs:
         with:
           app-name: 'hsaTransactionLogger'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4D0BEDF25A8A4CC3B5C78BD86302D0C8 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B2A3A70DA81740599FA406CA6563471B }}
           package: .
