@@ -1,6 +1,9 @@
-namespace Business.Models;
+using System.Collections.Generic;
 
-public record AnalyzeResult
+namespace Business.Models
 {
-    public List<ReadResult>? ReadResults { get; set; }
+    public record AnalyzeResult
+    {
+        public List<ReadResult>? ReadResults { get; set; }
+    }
 }

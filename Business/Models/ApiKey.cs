@@ -1,7 +1,8 @@
-namespace Business.Models;
-
-public record ApiKey
+namespace Business.Models
 {
-    public string? Name { get; set; }
-    public string? Value { get; set; }
+    public record ApiKey
+    {
+        public string? Name { get; set; }
+        public string? Value { get; set; }
+    }
 }

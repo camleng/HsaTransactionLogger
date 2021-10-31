@@ -1,15 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Business.Parsers;
 
-namespace Business.Extractors;
-
-public static class DateExtractor
+namespace Business.Extractors
 {
-    public static List<DateTime> ExtractDatesFrom(IEnumerable<string> lines)
+    public static class DateExtractor
     {
-        return lines.Select(l => DateParser.Parse(l, out var date).Success
-            ? date
-            : DateTime.MinValue)
-            .Where(d => d != DateTime.MinValue)
-            .ToList();
+        public static List<DateTime> ExtractDatesFrom(IEnumerable<string> lines)
+        {
+            return lines.Select(l => DateParser.Parse(l, out var date).Success
+                    ? date
+                    : DateTime.MinValue)
+                .Where(d => d != DateTime.MinValue)
+                .ToList();
+        }
     }
 }

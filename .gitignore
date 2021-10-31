@@ -3,3 +3,4 @@ obj
 .idea
 hsa.json
 appsettings.Development.json
+*.user

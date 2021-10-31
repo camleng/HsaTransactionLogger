@@ -1,6 +1,7 @@
-namespace Business.Models;
-
-public record Line
+namespace Business.Models
 {
-    public string? Text { get; set; }
+    public record Line
+    {
+        public string? Text { get; set; }
+    }
 }
