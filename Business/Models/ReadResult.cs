@@ -1,5 +1,9 @@
-namespace Business.Models;
+using System.Collections.Generic;
 
-public record ReadResult {
-    public List<Line>? Lines { get; set; }
-};
+namespace Business.Models
+{
+    public record ReadResult
+    {
+        public List<Line>? Lines { get; set; }
+    }
+}

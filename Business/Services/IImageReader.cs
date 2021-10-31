@@ -1,6 +1,10 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-public interface IImageReader
+namespace Business.Services
 {
-    Task<string> ReadTextFromImageToJson(IFormFile file);
+    public interface IImageReader
+    {
+        Task<string> ReadTextFromImageToJsonAsync(IFormFile file);
+    }
 }

@@ -1,13 +1,16 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Business.Extractors;
-
-public static class TransactionTypeExtractor
+namespace Business.Extractors
 {
-    public static List<string> ExtractTransactionTypesFrom(IEnumerable<string> lines)
+    public static class TransactionTypeExtractor
     {
-        return lines
-            .Where(line => Regex.IsMatch(line, @"(Deposit|Benefits Card)"))
-            .ToList();
+        public static List<string> ExtractTransactionTypesFrom(IEnumerable<string> lines)
+        {
+            return lines
+                .Where(line => Regex.IsMatch(line, @"(Deposit|Benefits Card)"))
+                .ToList();
+        }
     }
 }
