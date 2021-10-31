@@ -4,11 +4,11 @@ using Business.Models;
 
 namespace Business.Extractors
 {
-    public static class TransactionExtractor
+    public static class TransactionBuilder
     {
-        public static List<Transaction> BuildTransactionsFromJson(string json)
+        public static List<Transaction> BuildTransactions(HsaResult hsaResult)
         {
-            var lines = TextLineExtractor.ExtractTextLinesFromJson(json);
+            var lines = TextLineExtractor.ExtractTextLines(hsaResult);
 
             var dates = DateExtractor.ExtractDatesFrom(lines);
             var prices = AmountExtractor.ExtractAmountsFrom(lines);

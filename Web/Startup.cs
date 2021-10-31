@@ -23,8 +23,8 @@ namespace Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<IImageReader, ImageReader>();
-            services.AddTransient<IImageUploader, ImageUploader>();
             services.AddTransient<IImageAnalyzer, ImageAnalyzer>();
+            services.AddTransient<IImageAnalyzeResultReader, ImageAnalyzeResultReader>();
             services.AddTransient<ITaskProxy, TaskProxy>();
             var baseAddress = Configuration.GetSection(nameof(CognitiveServicesConfig))
                 .GetValue<string>(nameof(CognitiveServicesConfig.BaseAddress));

@@ -21,9 +21,9 @@ namespace Web.Controllers
       [HttpPost]
       public async Task<ActionResult> ReconcileFromImage(IFormFile file)
       {
-         var json = await _imageReader.ReadTextFromImageToJsonAsync(file);
+         var hsaResult = await _imageReader.GetHsaTextInformationFromImage(file);
 
-         var transactions = TransactionExtractor.BuildTransactionsFromJson(json);
+         var transactions = TransactionBuilder.BuildTransactions(hsaResult);
 
          return Ok(transactions);
       }

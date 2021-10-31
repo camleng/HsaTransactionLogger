@@ -1,24 +1,13 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Business.Models;
 
 namespace Business.Extractors
 {
     public static class TextLineExtractor
     {
-        public static List<string> ExtractTextLinesFromJson(string json)
+        public static List<string> ExtractTextLines(HsaResult hsaResult)
         {
-            var hsaResult = JsonSerializer.Deserialize<HsaResult>(json,
-                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
-
-            if (hsaResult is null)
-            {
-                Console.WriteLine("Hsa result was unable to be parsed");
-                return new List<string>();
-            }
-
             return hsaResult.AnalyzeResult.ReadResults
                 .SelectMany(r =>
                     r.Lines.Select(l => l.Text))

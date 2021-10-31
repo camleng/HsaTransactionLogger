@@ -1,7 +1,9 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Business.Models;
 using Business.Validators;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using RestSharp;
 
@@ -11,59 +13,43 @@ namespace Business.Services
     {
         private readonly IRestClient _client;
         private readonly CognitiveServicesConfig _config;
-        private readonly ITaskProxy _task;
 
-        public ImageAnalyzer(IRestClient client, IConfiguration configuration, ITaskProxy task)
+        public ImageAnalyzer(IRestClient client, IConfiguration configuration)
         {
             _client = client;
-            _task = task;
             _config = configuration.GetSection(nameof(CognitiveServicesConfig)).Get<CognitiveServicesConfig>();
             ConfigurationValidators.VerifyCognitiveServicesConfig(_config);
         }
-        
-        public async Task<string> GetAnalyzeResultAsync(string operationLocationAddress)
+
+        public async Task<IRestResponse> AnalyzeAsync(IFormFile file)
         {
-            var analyzeResultRequest = CreateAnalyzeResultRestRequest(operationLocationAddress);
-            var numberOfRetries = 0;
-            while (true)
+            var bytes = await GetBytesFromFile(file);
+
+            var uploadRequest = CreateAnalyzeRestRequest(bytes);
+            var postImageResponse = _client.Post(uploadRequest);
+
+            if (!postImageResponse.IsSuccessful)
             {
-                if (numberOfRetries > _config.MaxNumberOfRetries)
-                {
-                    throw new Exception("Max number of retries exceeded");
-                }
-
-                var analyzeResultResponse = _client.Get<HsaResult>(analyzeResultRequest);
-                if (!analyzeResultResponse.IsSuccessful)
-                {
-                    throw new Exception(analyzeResultResponse.Content);
-                }
-
-                if (OperationSucceeded(analyzeResultResponse))
-                {
-                    return analyzeResultResponse.Content;
-                }
-                
-                numberOfRetries++;
-                await _task.Delay(CalculateRetryPeriod(numberOfRetries));
+                throw new Exception(postImageResponse.Content);
             }
+
+            return postImageResponse;
         }
 
-        private static int CalculateRetryPeriod(int numberOfRetries)
+        private RestRequest CreateAnalyzeRestRequest(byte[] bytes)
         {
-            var delayMilliseconds = Math.Pow(2, numberOfRetries) * 1000;
-            return Convert.ToInt32(delayMilliseconds);
+            var restRequest = new RestRequest(_config.AnalyzeAddress);
+            AddApiKeyHeader(restRequest);
+            restRequest.AddFileBytes("file", bytes, "file", "image/png");
+            return restRequest;
         }
 
-        private RestRequest CreateAnalyzeResultRestRequest(string operationLocationAddress)
+        private static async Task<byte[]> GetBytesFromFile(IFormFile file)
         {
-            var analyzeResultRequest = new RestRequest(operationLocationAddress);
-            AddApiKeyHeader(analyzeResultRequest);
-            return analyzeResultRequest;
-        }
-        
-        private static bool OperationSucceeded(IRestResponse<HsaResult> analyzeResultResponse)
-        {
-            return analyzeResultResponse.Data.Status == "succeeded";
+            await using var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream);
+            var bytes = memoryStream.ToArray();
+            return bytes;
         }
 
         private void AddApiKeyHeader(IRestRequest request)

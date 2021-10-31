@@ -13,8 +13,8 @@ namespace Business.Tests.Services
     public class ImageReaderTests
     {
         private readonly IFormFile _file;
-        private readonly IImageUploader _imageUploader;
         private readonly IImageAnalyzer _imageAnalyzer;
+        private readonly IImageAnalyzeResultReader _imageAnalyzeResultReader;
         private readonly ImageReader _imageReader;
 
         public ImageReaderTests()
@@ -22,19 +22,19 @@ namespace Business.Tests.Services
             _file = Substitute.For<IFormFile>();
             var successfulResponse = RestClientHelper.SuccessfulResponseWithContent("It worked!")
                 .WithHeaders(("Operation-Location", "SomeLocation"));
-            _imageUploader = Substitute.For<IImageUploader>();
             _imageAnalyzer = Substitute.For<IImageAnalyzer>();
-            _imageUploader.StartImageReadingProcessAsync(_file).Returns(successfulResponse);
+            _imageAnalyzeResultReader = Substitute.For<IImageAnalyzeResultReader>();
+            _imageAnalyzer.AnalyzeAsync(_file).Returns(successfulResponse);
 
-            _imageReader = new ImageReader(_imageUploader, _imageAnalyzer);
+            _imageReader = new ImageReader(_imageAnalyzer, _imageAnalyzeResultReader);
         }
 
         [Fact]
-        public async Task ItUploadsTheImage()
+        public async Task ItAnalyzesTheImage()
         {
-            await _imageReader.ReadTextFromImageToJsonAsync(_file);
+            await _imageReader.GetHsaTextInformationFromImage(_file);
 
-            await _imageUploader.Received(1).StartImageReadingProcessAsync(_file);
+            await _imageAnalyzer.Received(1).AnalyzeAsync(_file);
         }
 
         [Fact]
@@ -42,10 +42,10 @@ namespace Business.Tests.Services
         {
             var successfulResponseWithEmptyHeaders =
                 RestClientHelper.SuccessfulResponseWithContent("It worked!").WithEmptyHeaders();
-            _imageUploader.StartImageReadingProcessAsync(_file).Returns(successfulResponseWithEmptyHeaders);
+            _imageAnalyzer.AnalyzeAsync(_file).Returns(successfulResponseWithEmptyHeaders);
 
             var thrownException = await Assert.ThrowsAsync<Exception>(async () =>
-                await _imageReader.ReadTextFromImageToJsonAsync(_file));
+                await _imageReader.GetHsaTextInformationFromImage(_file));
             thrownException.Message.Should().Be("Response does not include Operation-Location header");
         }
 
@@ -54,11 +54,11 @@ namespace Business.Tests.Services
         {
             var response = RestClientHelper.SuccessfulResponseWithContent("Image is uploaded")
                 .WithHeaders(("Operation-Location", "https://example.com"));
-            _imageUploader.StartImageReadingProcessAsync(_file).Returns(response);
+            _imageAnalyzer.AnalyzeAsync(_file).Returns(response);
             
-            await _imageReader.ReadTextFromImageToJsonAsync(_file);
+            await _imageReader.GetHsaTextInformationFromImage(_file);
 
-            await _imageAnalyzer.Received(1).GetAnalyzeResultAsync("https://example.com");
+            await _imageAnalyzeResultReader.Received(1).GetAnalyzeResultAsync("https://example.com");
         }
     }
 }

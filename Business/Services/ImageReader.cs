@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Business.Models;
 using Microsoft.AspNetCore.Http;
 using RestSharp;
 
@@ -8,20 +9,20 @@ namespace Business.Services
 {
     public class ImageReader : IImageReader
     {
-        private readonly IImageUploader _imageUploader;
         private readonly IImageAnalyzer _imageAnalyzer;
+        private readonly IImageAnalyzeResultReader _imageAnalyzeResultReader;
 
-        public ImageReader(IImageUploader imageUploader, IImageAnalyzer imageAnalyzer)
+        public ImageReader(IImageAnalyzer imageAnalyzer, IImageAnalyzeResultReader imageAnalyzeResultReader)
         {
-            _imageUploader = imageUploader;
             _imageAnalyzer = imageAnalyzer;
+            _imageAnalyzeResultReader = imageAnalyzeResultReader;
         }
 
-        public async Task<string> ReadTextFromImageToJsonAsync(IFormFile file)
+        public async Task<HsaResult> GetHsaTextInformationFromImage(IFormFile file)
         {
-            var postImageResponse = await _imageUploader.StartImageReadingProcessAsync(file);
-            var operationLocationAddress = GetOperationLocationHeader(postImageResponse);
-            return await _imageAnalyzer.GetAnalyzeResultAsync(operationLocationAddress);
+            var analyzeResponse = await _imageAnalyzer.AnalyzeAsync(file);
+            var operationLocationAddress = GetOperationLocationHeader(analyzeResponse);
+            return await _imageAnalyzeResultReader.GetAnalyzeResultAsync(operationLocationAddress);
         }
 
         private string GetOperationLocationHeader(IRestResponse postImageResponse)
